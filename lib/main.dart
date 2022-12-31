@@ -1,7 +1,9 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:video/compass_manager.dart';
 import 'package:video/home_screen.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -9,8 +11,6 @@ void main() async {
   await availableCameras().then((value) => cameras = value);
   await SystemChrome.setPreferredOrientations(
     [
-      DeviceOrientation.portraitDown,
-      DeviceOrientation.portraitUp,
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ],
@@ -26,11 +26,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Video',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: HomeScreen(cameras: cameras),
-    );
+        title: 'Video',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: ChangeNotifierProvider(
+          create: (_) => CompassManager(),
+          child: HomeScreen(cameras: cameras),
+        ));
   }
 }
