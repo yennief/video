@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 Container ButtonDarker(BuildContext context, String title, Function onTap,
     {bool shouldExpand = true,
-    double width = 0.4,
+    double width = 0.6,
     double height = 0.06,
     EdgeInsets margin = const EdgeInsets.fromLTRB(0, 10, 0, 30)}) {
   return Container(
@@ -21,7 +21,7 @@ Container ButtonDarker(BuildContext context, String title, Function onTap,
             if (states.contains(MaterialState.pressed)) {
               return Colors.black26;
             }
-            return Color(0xFFB65F56);
+            return Color.fromARGB(255, 164, 30, 30);
           }),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)))),

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:flutter_compass/flutter_compass.dart';
@@ -17,6 +19,7 @@ class CompassWidget extends StatelessWidget {
     double width = 70;
     double height = 70;
     int ang = 0;
+
     return StreamBuilder<CompassEvent>(
       stream: FlutterCompass.events,
       builder: (context, snapshot) {
@@ -24,7 +27,7 @@ class CompassWidget extends StatelessWidget {
           return Text('Error reading heading: ${snapshot.error}');
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(),
           );
         }
@@ -33,7 +36,13 @@ class CompassWidget extends StatelessWidget {
           return Center(
             child: Text("Device does not have sensors !"),
           );
-        ang = ((direction.round()) + 90) % 360;
+        if (Platform.isIOS) {
+          ang = ((direction.round()) + 90) % 360;
+        } else if (Platform.isAndroid) {
+          direction.round() < 0
+              ? ang = (direction.round()) + 360
+              : ang = (direction.round());
+        }
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Provider.of<CompassManager>(context, listen: false).setAng(ang);
         });
@@ -44,16 +53,21 @@ class CompassWidget extends StatelessWidget {
                 Container(
                   width: width,
                   height: height,
-                  padding: EdgeInsets.all(5.0),
+                  padding: const EdgeInsets.all(5.0),
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0xFFEBEBEB),
                   ),
                   child: Transform.rotate(
-                    angle: ((((direction.round()) + 90) % 360 ?? 0) *
-                        (math.pi / 180) *
-                        -1),
+                    angle: Platform.isIOS
+                        ? ((((direction.round()) + 90) % 360 ?? 0) *
+                            (math.pi / 180) *
+                            -1)
+                        : (((direction < 0 ? direction + 360 : direction) ??
+                                0) *
+                            (math.pi / 180) *
+                            -1),
                     child: Image.asset('assets/compass.png'),
                   ),
                 ),

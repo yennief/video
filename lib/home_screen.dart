@@ -37,16 +37,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildBody() {
+    // print(_numberController.text);
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Padding(
             padding: EdgeInsets.only(
-                right: MediaQuery.of(context).size.width * 0.4,
-                left: MediaQuery.of(context).size.width * 0.4),
+                right: MediaQuery.of(context).size.width * 0.3,
+                left: MediaQuery.of(context).size.width * 0.3),
             child: TextField(
               controller: _numberController,
-              decoration: const InputDecoration(labelText: "Enter angle"),
+              decoration: const InputDecoration(labelText: "Enter azimuth"),
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.digitsOnly
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       create: (_) => CompassManager(),
                       child: CameraScreen(
                           cameras: widget.cameras,
-                          chosenAngle: int.parse(_numberController.text))),
+                          chosenAngle: _numberController.text)),
                 ),
               );
             })),

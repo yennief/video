@@ -1,15 +1,17 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 import 'package:video/compass_manager.dart';
-import 'package:flutter_beep/flutter_beep.dart';
 import 'compass_widget.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key, this.cameras, this.chosenAngle});
+  CameraScreen({super.key, this.cameras, this.chosenAngle});
   final List<CameraDescription>? cameras;
-  final int? chosenAngle;
+  final String? chosenAngle;
+  int? angle;
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -21,6 +23,7 @@ class _CameraScreenState extends State<CameraScreen> {
   double lowerValue = 0.0;
   int ang = 0;
   bool isChosen = false;
+  late AudioPlayer audioPlayer;
 
   Future initCamera(CameraDescription cameraDescription) async {
     _cameraController =
@@ -39,6 +42,8 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
+    audioPlayer = AudioPlayer();
+    // audioPlayer.setSourceAsset("");
     initCamera(widget.cameras![0]);
   }
 
@@ -50,28 +55,54 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.chosenAngle != "") {
+      widget.angle = int.parse(widget.chosenAngle!);
+    } else {
+      widget.angle = null;
+    }
     ang = Provider.of<CompassManager>(context, listen: true).getAng;
-    if (ang == widget.chosenAngle) {
+
+    if (widget.angle != null && ang == widget.angle) {
       isChosen = true;
-      FlutterBeep.beep();
-      //play the loudest sound
+      audioPlayer.play(AssetSource("long-beep.mp3"));
+      Future.delayed(const Duration(seconds: 2)).then((value) {
+        audioPlayer.stop();
+      });
     } else {
       isChosen = false;
     }
-    if (ang + 10 == widget.chosenAngle || ang - 10 == widget.chosenAngle) {
-      //play one sound
-      FlutterBeep.playSysSound(iOSSoundIDs.AudioToneError);
-    }
-    if (ang + 5 == widget.chosenAngle || ang - 5 == widget.chosenAngle) {
-      //play louder sound
-      FlutterBeep.beep(false);
+    for (int i = 10; i > 0; i--) {
+      if (widget.angle != null &&
+          (ang + i == widget.angle || ang - i == widget.angle)) {
+        if (i <= 10 && i > 5) {
+          audioPlayer.play(AssetSource("beep.mp3"));
+          audioPlayer.setPlaybackRate(1.0);
+        } else if (i <= 5 && i > 2) {
+          audioPlayer.play(AssetSource("beep.mp3"));
+          audioPlayer.setPlaybackRate(2.0);
+        } else {
+          audioPlayer.play(AssetSource("beep.mp3"));
+          audioPlayer.setPlaybackRate(3.0);
+        }
+      }
     }
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          foregroundColor: Colors.black,
+          elevation: 0,
+          title: Text(""),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.arrow_back_ios))),
       body: OrientationBuilder(builder: (context, orientation) {
         return Stack(children: [
           (_cameraController.value.isInitialized)
-              ? Container(
+              ? SizedBox(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                   child: CameraPreview(_cameraController))
@@ -79,18 +110,18 @@ class _CameraScreenState extends State<CameraScreen> {
                   color: Colors.white,
                   child: const Center(child: CircularProgressIndicator())),
           Padding(
-              padding: EdgeInsets.only(top: 10, left: 40),
+              padding: const EdgeInsets.only(top: 10, left: 40),
               child: Text(
                 "$ang",
                 style: TextStyle(
-                  color: isChosen ? Colors.green : Colors.red,
-                  fontSize: 80,
-                ),
+                    color: isChosen ? Colors.green : Colors.red,
+                    fontSize: 80,
+                    fontFamily: 'digi'),
               )),
           Padding(
               padding: EdgeInsets.only(
                   top: MediaQuery.of(context).size.height * 0.75, left: 40),
-              child: Align(
+              child: const Align(
                   alignment: Alignment.bottomLeft, child: CompassWidget())),
           Padding(
               padding: EdgeInsets.only(top: 50, right: 10),
@@ -147,7 +178,6 @@ class _CameraScreenState extends State<CameraScreen> {
                 EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.3),
             child: Column(
               children: [
-                // const Spacer(),
                 Padding(
                     padding: EdgeInsets.only(
                         left: MediaQuery.of(context).size.width * 0.85),
