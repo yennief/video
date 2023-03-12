@@ -1,4 +1,4 @@
-# video
+# Video
 
 A tool created to support the work of a telecommunications technician during work on the base station.
 
