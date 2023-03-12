@@ -1,16 +1,9 @@
 # video
 
-A new Flutter project.
+A tool created to support the work of a telecommunications technician during work on the base station.
 
-## Getting Started
+Application lets user provide an azimuth, next on a camera screen there is a compass that shows current direction with azimuth. If azimuth is the one user provided, then color of it changes to green and user hears characteristic 'beep' sound. User also hears beep sound with different pace when getting closer to the azimuth.
 
-This project is a starting point for a Flutter application.
+# Tech Stack
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Flutter & Dart
